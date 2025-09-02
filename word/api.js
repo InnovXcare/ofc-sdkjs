@@ -10198,7 +10198,7 @@ background-repeat: no-repeat;\
 					oLogicDocument.Recalculate();
 					oLogicDocument.UpdateInterface();
 					oLogicDocument.UpdateSelection();
-
+					// debugger;
 					oResult = oContentControl.GetContentControlPr();
 				}
 
@@ -10216,7 +10216,7 @@ background-repeat: no-repeat;\
 				{
 					if (oContentControlPr)
 						oContentControl.SetContentControlPr(oContentControlPr);
-
+					// debugger;
 					oLogicDocument.Recalculate();
 					oLogicDocument.UpdateInterface();
 					oLogicDocument.UpdateSelection();
