@@ -82,7 +82,7 @@
             var oChange = new fChangesClass(Class);
             oChange.ReadFromBinary(Reader);
 
-            if (true === CollaborativeEditing.private_AddOverallChange(oChange))
+            if (true === CollaborativeEditing.private_AddOverallChange(oChange,undefined,this.m_pData))
             {
 				// // CollaborativeEditing LOG
 				// if (!(oChange instanceof AscCommon.CChangesTableIdDescription))
@@ -96,7 +96,7 @@
         }
         else
         {
-            CollaborativeEditing.private_AddOverallChange(this.m_pData);
+            CollaborativeEditing.private_AddOverallChange(this.m_pData,undefined, this.m_pData);
             // Сюда мы попадаем, когда у данного изменения нет класса и он все еще работает по старой схеме через объект
 
             Reader.Seek2(nReaderPos);
@@ -507,7 +507,7 @@
 						isStart = true;
 				}
 
-				if (this.private_AddOverallChange(change))
+				if (this.private_AddOverallChange(change,undefined,binary))
 				{
 					change.Load(color);
 					change.CheckNeedRecalculate();
@@ -1245,7 +1245,7 @@
 			}
 		}
 	};
-	CCollaborativeEditingBase.prototype.private_AddOverallChange  = function(oChange, isSave)
+	CCollaborativeEditingBase.prototype.private_AddOverallChange  = function(oChange, isSave, serialized)
 	{
 		// Здесь мы должны смержить пришедшее изменение с одним из наших изменений
 		for (var nIndex = 0, nCount = this.m_oOwnChanges.length; nIndex < nCount; ++nIndex)
@@ -1255,7 +1255,7 @@
 		}
 
 		if (false !== isSave)
-			this.CoHistory.AddChange(oChange);
+			this.CoHistory.AddChange(oChange,serialized);
 
 		return true;
 	};

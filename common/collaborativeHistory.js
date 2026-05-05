@@ -43,6 +43,8 @@
 	{
 		this.CoEditing = coEditing;
 
+		this.serializedChanges = [];
+
 		this.Changes   = []; // Список всех изменений
 		this.ChangesSplitByPoints = [] // Список изменений разделенных по точкам
 		this.OwnRanges = []; // Диапазоны собственных изменений
@@ -89,6 +91,8 @@
 		this.curChangeIndex = -1;
 		
 		this.textRecovery = null;
+
+		this.serializedChanges = [];
 	};
 	/**
 	 * Перемещаемся по истории ревизии на заданную точку
@@ -120,17 +124,22 @@
 		logicDocument.RecalculateByChanges(changes);
 		return true;
 	};
-	CCollaborativeHistory.prototype.AddChange = function(change)
+	CCollaborativeHistory.prototype.AddChange = function(change,serialized)
 	{
 		this.Changes.push(change);
+		if (serialized) this.serializedChanges.push(serialized);
+
 	};
-	CCollaborativeHistory.prototype.AddOwnChanges = function(ownChanges, deleteIndex)
+	CCollaborativeHistory.prototype.AddOwnChanges = function(ownChanges, deleteIndex,ownSerialized)
 	{
 		// TODO: При удалении изменений не удаляются OwnRanges, которые могли ссылаться на эти изменения
 		//       Надо проверить насколько это корректно
 
 		if (null !== deleteIndex)
+		{
 			this.Changes.length = this.SyncIndex + deleteIndex;
+			this.serializedChanges.length = this.SyncIndex + deleteIndex;
+		}
 		else
 			this.SyncIndex = this.Changes.length;
 
@@ -141,6 +150,8 @@
 		{
 			this.OwnRanges.push(new COwnRange(this.Changes.length, ownChanges.length));
 			this.Changes = this.Changes.concat(ownChanges);
+			if (Array.isArray(ownSerialized))
+				this.serializedChanges = this.serializedChanges.concat(ownSerialized)
 		}
 	};
 	CCollaborativeHistory.prototype.GetAllChanges = function()

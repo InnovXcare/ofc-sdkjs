@@ -379,7 +379,7 @@
     let frame = document.getElementById(frameId);
     if (frame)
       frame.contentWindow.postMessage(
-        JSON.stringify({ type: "FILE_DELTA_CHANGES", payload: arrayChanges }),
+        JSON.stringify({ type: "FILE_DELTA_CHANGES", payload: arrayChanges, deleteIndex}),
         "*"
       );
     if (this._CoAuthoringApi && this._onlineWork) {

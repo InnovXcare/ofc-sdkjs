@@ -145,7 +145,7 @@ CWordCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, Addition
 	var deleteIndex = ( null === AscCommon.History.SavedIndex ? null : SumIndex );
 	if (0 < aChanges.length || null !== deleteIndex)
 	{
-		this.CoHistory.AddOwnChanges(aChanges2, deleteIndex);
+		this.CoHistory.AddOwnChanges(aChanges2, deleteIndex,aChanges);
 		editor.CoAuthoringApi.saveChanges(aChanges, deleteIndex, AdditionalInfo, editor.canUnlockDocument2, bCollaborative);
 		AscCommon.History.CanNotAddChanges = true;
 	}
