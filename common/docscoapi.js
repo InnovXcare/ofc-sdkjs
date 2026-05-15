@@ -229,13 +229,15 @@
     return 0;
   };
 
+
   CDocsCoApi.prototype.set_changesJson = function(changes, done) {
+    var delayMs = 50;
     setTimeout(() => {
       this._CoAuthoringApi.updateAuthChangesWithJsonSet(changes)
       if (typeof done === "function") {
         done();
       }
-    }, 1500);
+    }, delayMs);
   };
 
   CDocsCoApi.prototype.openDocument = function(data) {

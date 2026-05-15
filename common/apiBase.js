@@ -550,9 +550,10 @@
 		this.CoAuthoringApi.set_changesJson(changes,done)
 	}
 	baseEditorsApi.prototype.asc_openDocumentForStandalone = function(documentInfo) {
+		var delayMs = 150;
 		setTimeout(() => {
 			this.CoAuthoringApi.onDocumentOpen(documentInfo);
-		}, 2000);
+		}, delayMs);
 	}
 
 	baseEditorsApi.prototype.asc_setDocInfo                  = function(oDocInfo)
