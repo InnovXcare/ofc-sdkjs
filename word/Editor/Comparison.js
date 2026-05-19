@@ -2662,11 +2662,11 @@
             const LogicDocuments = oOriginalDocument.TrackRevisionsManager.Get_AllChangesLogicDocuments();
             for (let LogicDocId in LogicDocuments)
             {
-                const LogicDoc = AscCommon.g_oTableId.Get_ById(LogicDocId);
-                if (LogicDoc)
-                {
-                    LogicDoc.AcceptRevisionChanges(undefined, true);
-                }
+				const LogicDoc = AscCommon.g_oTableId.Get_ById(LogicDocId);
+				if (LogicDoc && typeof LogicDoc.AcceptRevisionChanges === "function")
+				{
+					LogicDoc.AcceptRevisionChanges(undefined, true);
+				}
             }
             const NewNumbering = oRevisedDocument.Numbering.CopyAllNums(oOriginalDocument.Numbering);
             oRevisedDocument.CopyNumberingMap = NewNumbering.NumMap;
@@ -3139,7 +3139,7 @@
 			if (oCopyNum && oOrigNumbering)
 			{
 				const oOrigNum = AscCommon.g_oTableId.Get_ById(this.firstCheckNumId);
-				if (oOrigNum && oOrigNum.IsEqual(oCopyNum))
+				if (oOrigNum && typeof oOrigNum.IsEqual === "function" && oOrigNum.IsEqual(oCopyNum))
 				{
 					this.matchedNums[sNumId] = this.firstCheckNumId;
 					this.checkedNums[this.firstCheckNumId] = true;

@@ -38,6 +38,9 @@ var global_MatrixTransformer = AscCommon.global_MatrixTransformer;
 
 CTable.prototype.ReDraw = function()
 {
+    if (!this.Parent || !this.Pages || 0 === this.Pages.length)
+        return;
+
     this.Parent.OnContentReDraw( this.Get_StartPage_Absolute(), this.Get_StartPage_Absolute() + this.Pages.length - 1 );
 };
 CTable.prototype.Draw = function(CurPage, pGraphics, isDrawContent)

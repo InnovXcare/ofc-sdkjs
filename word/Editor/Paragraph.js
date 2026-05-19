@@ -3827,6 +3827,9 @@ Paragraph.prototype.Is_NeedDrawBorders = function()
 };
 Paragraph.prototype.ReDraw = function()
 {
+	if (!this.Parent || !this.Pages || 0 === this.Pages.length)
+		return;
+
 	this.Parent.OnContentReDraw(this.Get_AbsolutePage(0), this.Get_AbsolutePage(this.Pages.length - 1));
 };
 Paragraph.prototype.Shift = function(CurPage, Dx, Dy)

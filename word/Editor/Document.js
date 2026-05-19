@@ -6829,6 +6829,8 @@ CDocument.prototype.RemoveDrawingObjectById = function(sObjectId)
 {
     var oState = this.SaveDocumentState();
     var oDrawing = AscCommon.g_oTableId.Get_ById(sObjectId);
+    if (!oDrawing || typeof oDrawing.Set_CurrentElement !== "function")
+        return;
     oDrawing.Set_CurrentElement(false, null);
     if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_Remove, null, true, this.IsFormFieldEditing()))
     {
@@ -6843,6 +6845,10 @@ CDocument.prototype.RemoveDrawingObjects = function(arrObjectsId)
     var oState = this.SaveDocumentState();
     var oDrawing = AscCommon.g_oTableId.Get_ById(arrObjectsId[0]);
     if(!oDrawing)
+    {
+        return;
+    }
+    if (typeof oDrawing.Set_CurrentElement !== "function")
     {
         return;
     }
@@ -18740,7 +18746,9 @@ CDocument.prototype.AcceptAllRevisionChanges = function(isSkipCheckLock, isCheck
 		for (let docContentId in docContentArray)
 		{
 			let docContent = AscCommon.g_oTableId.Get_ById(docContentId);
-			if (!docContent)
+			if (!docContent
+				|| typeof docContent.AcceptRevisionChanges !== "function"
+				|| typeof docContent.GetElementsCount !== "function")
 				continue;
 			
 			docContent.AcceptRevisionChanges(undefined, true);
@@ -18812,7 +18820,9 @@ CDocument.prototype.private_RejectAllRevisionChanges = function()
 	for (let docContentId in docContentArray)
 	{
 		let docContent = AscCommon.g_oTableId.Get_ById(docContentId);
-		if (!docContent)
+		if (!docContent
+			|| typeof docContent.RejectRevisionChanges !== "function"
+			|| typeof docContent.GetElementsCount !== "function")
 			continue;
 		
 		docContent.RejectRevisionChanges(undefined, true);
@@ -19742,17 +19752,19 @@ CDocument.prototype.AddPlaceholderImages = function (aImages, oPlaceholder)
 		const oPlaceholderTarget = AscCommon.g_oTableId.Get_ById(oPlaceholder.id);
 		if (oPlaceholderTarget)
 		{
-			if (oPlaceholderTarget.isObjectInSmartArt && oPlaceholderTarget.isObjectInSmartArt())
+			if (typeof oPlaceholderTarget.isObjectInSmartArt === "function" && oPlaceholderTarget.isObjectInSmartArt())
 			{
 				
 				if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_Drawing_Props, undefined, false, false))
 				{
 					this.StartAction(AscDFH.historydescription_Document_AddPlaceholderImages);
-					oPlaceholderTarget.applyImagePlaceholderCallback && oPlaceholderTarget.applyImagePlaceholderCallback(aImages, oPlaceholder);
-					const nDrawingPage = oPlaceholderTarget.Get_AbsolutePage();
+					if (typeof oPlaceholderTarget.applyImagePlaceholderCallback === "function")
+						oPlaceholderTarget.applyImagePlaceholderCallback(aImages, oPlaceholder);
+					const nDrawingPage = typeof oPlaceholderTarget.Get_AbsolutePage === "function" ? oPlaceholderTarget.Get_AbsolutePage() : undefined;
 					if (AscFormat.isRealNumber(nDrawingPage))
 					{
-						oPlaceholderTarget.Set_CurrentElement(false, nDrawingPage, true);
+						if (typeof oPlaceholderTarget.Set_CurrentElement === "function")
+							oPlaceholderTarget.Set_CurrentElement(false, nDrawingPage, true);
 					}
 					this.Document_UpdateSelectionState();
 					this.Document_UpdateUndoRedoState();
@@ -29725,4 +29737,3 @@ CDocumentSectionProps.prototype["get_GutterAtTop"]    = CDocumentSectionProps.pr
 CDocumentSectionProps.prototype["put_GutterAtTop"]    = CDocumentSectionProps.prototype.put_GutterAtTop;
 CDocumentSectionProps.prototype["get_MirrorMargins"]  = CDocumentSectionProps.prototype.get_MirrorMargins;
 CDocumentSectionProps.prototype["put_MirrorMargins"]  = CDocumentSectionProps.prototype.put_MirrorMargins;
-

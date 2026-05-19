@@ -326,7 +326,7 @@ CChangesParaCommentCommentId.prototype.Load = function()
 	this.Redo();
 
 	var oComment = AscCommon.g_oTableId.Get_ById(this.New);
-	if (oComment instanceof AscCommon.CComment)
+	if (oComment instanceof AscCommon.CComment && typeof oComment.UpdatePosition === "function")
 		oComment.UpdatePosition();
 };
 CChangesParaCommentCommentId.prototype.CreateReverseChange = function()

@@ -924,6 +924,9 @@ CDocumentContentElementBase.prototype.private_GetRelativePageIndex = function(Cu
 };
 CDocumentContentElementBase.prototype.private_GetAbsolutePageIndex = function(CurPage)
 {
+	if (!this.Parent || "function" !== typeof(this.Parent.Get_AbsolutePage))
+		return this.private_GetRelativePageIndex(CurPage);
+
 	return this.Parent.Get_AbsolutePage(this.private_GetRelativePageIndex(CurPage));
 };
 CDocumentContentElementBase.prototype.Get_AbsolutePage = function(CurPage)

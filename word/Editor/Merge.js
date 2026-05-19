@@ -615,12 +615,19 @@
                 const oInsertParaMove = oInsertInfo.moveMark;
                 if (oInsertMoveMarkId[oInsertParaMove.Name]) {
                     const oRun = AscCommon.g_oTableId.Get_ById(sId);
+                    if (!oRun) {
+                        continue;
+                    }
                     if (oInsertInfo.isParaEnd) {
-                        oRun.AddAfterParaEnd(oInsertParaMove);
-                        } else {
+                        if (typeof oRun.AddAfterParaEnd === "function") {
+                            oRun.AddAfterParaEnd(oInsertParaMove);
+                        }
+                        } else if (typeof oRun.GetParent === "function" && typeof oRun.GetPosInParent === "function") {
                         const oParent = oRun.GetParent();
                         const nPosition = oRun.GetPosInParent(oParent);
-                        oParent.AddToContent(nPosition, oInsertParaMove);
+                        if (oParent && typeof oParent.AddToContent === "function") {
+                            oParent.AddToContent(nPosition, oInsertParaMove);
+                        }
                     }
                 }
             }

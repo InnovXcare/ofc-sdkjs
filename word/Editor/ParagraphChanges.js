@@ -400,7 +400,7 @@ CChangesParagraphAddItem.prototype.Load = function(Color)
 			if (para_Comment === Element.Type)
 			{
 				var oComment = AscCommon.g_oTableId.Get_ById(Element.CommentId);
-				if (oComment instanceof AscCommon.CComment)
+				if (oComment instanceof AscCommon.CComment && typeof oComment.UpdatePosition === "function")
 					oComment.UpdatePosition();
 			}
 

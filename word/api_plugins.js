@@ -874,6 +874,10 @@
 		{
 			return;
 		}
+		if (typeof oDrawing.Set_CurrentElement !== "function")
+		{
+			return;
+		}
 		oDrawing.Set_CurrentElement(true, null);
 	};
 

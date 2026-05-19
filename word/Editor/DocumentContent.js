@@ -485,13 +485,22 @@ CDocumentContent.prototype.Recalc_AllParagraphs_CompiledPr = function()
 	for (var Pos = 0; Pos < Count; Pos++)
 	{
 		var Item = this.Content[Pos];
+		if (!Item || "function" !== typeof(Item.GetType))
+			continue;
+
 		if (type_Paragraph === Item.GetType())
 		{
-			Item.Recalc_CompiledPr();
-			Item.Recalc_RunsCompiledPr();
+			if ("function" === typeof(Item.Recalc_CompiledPr))
+				Item.Recalc_CompiledPr();
+			
+			if ("function" === typeof(Item.Recalc_RunsCompiledPr))
+				Item.Recalc_RunsCompiledPr();
 		}
 		else if (type_Table === Item.GetType())
-			Item.Recalc_CompiledPr2();
+		{
+			if ("function" === typeof(Item.Recalc_CompiledPr2))
+				Item.Recalc_CompiledPr2();
+		}
 	}
 };
 CDocumentContent.prototype.Set_CurrentElement = function(Index, bUpdateStates)
@@ -572,7 +581,7 @@ CDocumentContent.prototype.Get_NearestPos = function(CurPage, X, Y, bAnchor, Dra
 
 	// Заглушка для плохих Fixed-форм
 	var oShape = this.Is_DrawingShape(true);
-	if (oShape && oShape.isForm())
+	if (oShape && typeof oShape.isForm === "function")
 		ContentPos = 0;
 
 	var ElementPageIndex = this.private_GetElementPageIndexByXY(ContentPos, X, Y, CurPage);

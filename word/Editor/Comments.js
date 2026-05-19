@@ -499,11 +499,11 @@ function CCommentDrawingRect(X, Y, W, H, CommentId, InvertTransform)
 	CComment.prototype.RemoveMarks = function()
 	{
 		var oMark = AscCommon.g_oTableId.Get_ById(this.RangeStart);
-		if (oMark)
+		if (oMark && typeof oMark.RemoveMark === "function")
 			oMark.RemoveMark();
 
 		oMark = AscCommon.g_oTableId.Get_ById(this.RangeEnd);
-		if (oMark)
+		if (oMark && typeof oMark.RemoveMark === "function")
 			oMark.RemoveMark();
 	};
 	CComment.prototype.Set_TypeInfo = function(Type, Data)
@@ -696,7 +696,7 @@ function CCommentDrawingRect(X, Y, W, H, CommentId, InvertTransform)
 	CComment.prototype.MoveCursorToStart = function()
 	{
 		var oRangeStart = AscCommon.g_oTableId.Get_ById(this.RangeStart);
-		if (oRangeStart)
+		if (oRangeStart && typeof oRangeStart.MoveCursorToMark === "function")
 			oRangeStart.MoveCursorToMark();
 	};
 	CComment.prototype.SetPosition = function(nPos)
@@ -721,7 +721,10 @@ function CCommentDrawingRect(X, Y, W, H, CommentId, InvertTransform)
 	{
 		var oMark = AscCommon.g_oTableId.Get_ById(this.RangeStart);
 
-		if (!oMark || !oMark.IsUseInDocument())
+		if (!oMark
+			|| typeof oMark.IsUseInDocument !== "function"
+			|| !oMark.IsUseInDocument()
+			|| typeof oMark.GetDocumentPositionFromObject !== "function")
 			return null;
 
 		return oMark.GetDocumentPositionFromObject();
@@ -741,7 +744,12 @@ function CCommentDrawingRect(X, Y, W, H, CommentId, InvertTransform)
 	{
 		const oStartMark = AscCommon.g_oTableId.Get_ById(this.GetRangeStart());
 		const oEndMark = AscCommon.g_oTableId.Get_ById(this.GetRangeEnd());
-		if (!oStartMark || !oEndMark)
+		if (!oStartMark
+			|| !oEndMark
+			|| typeof oStartMark.GetParagraph !== "function"
+			|| typeof oEndMark.GetParagraph !== "function"
+			|| typeof oStartMark.MoveCursorToMark !== "function"
+			|| typeof oEndMark.MoveCursorToMark !== "function")
 			return false;
 
 		const oStartParagraph = oStartMark.GetParagraph();

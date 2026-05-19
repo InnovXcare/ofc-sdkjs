@@ -478,7 +478,7 @@
 		for (var sParaId in this.Changes)
 		{
 			var oParagraph = AscCommon.g_oTableId.Get_ById(sParaId);
-			if (!oParagraph || !oParagraph.IsUseInDocument())
+			if (!oParagraph || typeof oParagraph.IsUseInDocument !== "function" || !oParagraph.IsUseInDocument())
 				continue;
 
 			for (var nIndex = 0, nCount = this.Changes[sParaId].length; nIndex < nCount; ++nIndex)
@@ -731,9 +731,11 @@
 		for (var ParaId in this.Changes)
 		{
 			var Para = AscCommon.g_oTableId.Get_ById(ParaId);
-			if (Para && Para.Get_Parent())
+			if (Para && typeof Para.Get_Parent === "function" && Para.Get_Parent())
 			{
-				LogicDocuments[Para.Get_Parent().Get_Id()] = true;
+				var oParent = Para.Get_Parent();
+				if (oParent && typeof oParent.Get_Id === "function")
+					LogicDocuments[oParent.Get_Id()] = true;
 			}
 		}
 

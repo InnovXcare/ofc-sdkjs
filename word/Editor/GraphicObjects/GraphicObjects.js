@@ -255,7 +255,10 @@ CGraphicObjects.prototype =
 
                 var oShape     = AscCommon.g_oTableId.Get_ById(ret.objectId);
                 var oInnerForm = null;
-                if (oShape && oShape.isForm() && (oInnerForm = oShape.getInnerForm()))
+                if (oShape
+                    && typeof oShape.isForm === "function"
+                    && typeof oShape.getInnerForm === "function"
+                    && (oInnerForm = oShape.getInnerForm()))
 				{
 					if (isDrawHandles && oInnerForm.IsFormLocked())
 						isDrawHandles = false;
@@ -2974,7 +2977,7 @@ CGraphicObjects.prototype =
 			}
 		}
 
-		if (!object.parent.isHdrFtrChild(false))
+		if (!(object.parent && typeof object.parent.isHdrFtrChild === "function" && object.parent.isHdrFtrChild(false)))
 		{
 			this.graphicPages[pageIndex].addObject(object);
 		}
@@ -3636,7 +3639,7 @@ CGraphicObjects.prototype =
             var object = AscCommon.g_oTableId.Get_ById(ret.objectId);
             if(isRealObject(object) && (!(bSelected === true) ||  bSelected && object.selected) )
             {
-                if(object.group)
+                if(object.group && typeof object.getMainGroup === "function")
                     object = object.getMainGroup();
 
                 if(isRealObject(object) && isRealObject(object.parent))
@@ -4363,8 +4366,8 @@ CGraphicObjects.prototype =
         const oDrawing = AscCommon.g_oTableId.Get_ById(sId);
         if(isRealObject(oDrawing))
         {
-            let bHdrFtr = oDrawing.isHdrFtrChild(false);
-            if(!bHdrFtr)
+            let bHdrFtr = (typeof oDrawing.isHdrFtrChild === "function") ? oDrawing.isHdrFtrChild(false) : false;
+            if(bHdrFtr)
             {
                 let oPage = this.graphicPages[nPageIdx];
                 if(isRealObject(oPage))
@@ -4391,9 +4394,9 @@ CGraphicObjects.prototype =
         var obj = AscCommon.g_oTableId.Get_ById(id), nPageIndex = pageIndex;
         if(obj && obj.GraphicObj)
         {
-            if(obj.isHdrFtrChild(false))
+            if(typeof obj.isHdrFtrChild === "function" && obj.isHdrFtrChild(false))
             {
-                const oDocContent = obj.GetDocumentContent();
+                const oDocContent = (typeof obj.GetDocumentContent === "function") ? obj.GetDocumentContent() : null;
                 if(oDocContent && oDocContent.Get_StartPage_Absolute() !== obj.PageNum)
                 {
                     nPageIndex = obj.PageNum;
