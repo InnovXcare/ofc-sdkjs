@@ -1852,7 +1852,7 @@
 		}
 		var oNvPr = this.getCNvProps();
 		if (oNvPr) {
-			oNvPr.setDescr(sDescription ? sDescription : null);
+			oNvPr.setDescr(sDescription);
 		}
 	};
 	CGraphicObjectBase.prototype.setName = function (sName) {

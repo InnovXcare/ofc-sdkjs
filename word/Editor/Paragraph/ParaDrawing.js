@@ -1078,9 +1078,15 @@ ParaDrawing.prototype.Set_Props = function(Props)
 
 	if(undefined != Props.description){
 		this.docPr.setDescr(Props.description);
+		if (this.GraphicObj && this.GraphicObj.setDescription) {
+			this.GraphicObj.setDescription(Props.description);
+		}
 	}
 	if(undefined != Props.title){
 		this.docPr.setTitle(Props.title);
+		if (this.GraphicObj && this.GraphicObj.setTitle) {
+			this.GraphicObj.setTitle(Props.title);
+		}
 	}
 };
 ParaDrawing.prototype.CheckFitToColumn = function()

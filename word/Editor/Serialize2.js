@@ -6338,6 +6338,24 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 	this.WriteDocPr = function(docPr, oParaDrawing)
 	{
 		var oThis = this;
+		
+		var sTitle = docPr.title;
+		var sDescr = docPr.descr;
+		if (oParaDrawing && oParaDrawing.GraphicObj) {
+			var oGraphic = oParaDrawing.GraphicObj;
+			if ((null == sDescr || sDescr === "") && oGraphic.getDescription) {
+				var sGraphicDescr = oGraphic.getDescription();
+				if (null != sGraphicDescr && sGraphicDescr !== "") {
+					sDescr = sGraphicDescr;
+				}
+			}
+			if ((null == sTitle || sTitle === "") && oGraphic.getTitle) {
+				var sGraphicTitle = oGraphic.getTitle();
+				if (null != sGraphicTitle && sGraphicTitle !== "") {
+					sTitle = sGraphicTitle;
+				}
+			}
+		}
 		this.bs.WriteItem(c_oSerDocPr.Id, function(){oThis.memory.WriteLong(docPr.id);});
 		if (null != docPr.name) {
 			this.memory.WriteByte(c_oSerDocPr.Name);
@@ -6346,13 +6364,13 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 		if (null != docPr.isHidden) {
 			this.bs.WriteItem(c_oSerDocPr.Hidden, function(){oThis.memory.WriteBool(docPr.isHidden);});
 		}
-		if (null != docPr.title) {
+		if (null != sTitle) {
 			this.memory.WriteByte(c_oSerDocPr.Title);
-			this.memory.WriteString2(docPr.title);
+			this.memory.WriteString2(sTitle);
 		}
-		if (null != docPr.descr) {
+		if (null != sDescr) {
 			this.memory.WriteByte(c_oSerDocPr.Descr);
-			this.memory.WriteString2(docPr.descr);
+			this.memory.WriteString2(sDescr);
 		}
 		if (oParaDrawing && oParaDrawing.IsForm()) {
 			this.bs.WriteItem(c_oSerDocPr.Form, function(){oThis.memory.WriteBool(oParaDrawing.IsForm());});
@@ -12395,8 +12413,23 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curNot
         {
 			if(length > 0){
 				var grObject = pptx_content_loader.ReadDrawing(this, this.stream, this.Document, oParaDrawing);
-				if(null != grObject)
+				if(null != grObject) {
 					oParaDrawing.Set_GraphicObject(grObject);
+					if (oParaDrawing.docPr) {
+						if (null != oParaDrawing.docPr.descr && oParaDrawing.docPr.descr !== "" && grObject.setDescription) {
+							var sGrDescr = grObject.getDescription ? grObject.getDescription() : null;
+							if (null == sGrDescr || sGrDescr === "") {
+								grObject.setDescription(oParaDrawing.docPr.descr);
+							}
+						}
+						if (null != oParaDrawing.docPr.title && oParaDrawing.docPr.title !== "" && grObject.setTitle) {
+							var sGrTitle = grObject.getTitle ? grObject.getTitle() : null;
+							if (null == sGrTitle || sGrTitle === "") {
+								grObject.setTitle(oParaDrawing.docPr.title);
+							}
+						}
+					}
+				}
 			}
 			else
 				res = c_oSerConstants.ReadUnknown;
@@ -12628,8 +12661,22 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curNot
 			docPr.setIsHidden(this.stream.GetBool());
 		} else if (c_oSerDocPr.Title === type) {
 			docPr.setTitle(this.stream.GetString2LE(length));
+			if (oParaDrawing && oParaDrawing.GraphicObj && oParaDrawing.GraphicObj.setTitle) {
+				var sTitle = docPr.title;
+				var sGrTitle = oParaDrawing.GraphicObj.getTitle ? oParaDrawing.GraphicObj.getTitle() : null;
+				if ((null == sGrTitle || sGrTitle === "") && null != sTitle && sTitle !== "") {
+					oParaDrawing.GraphicObj.setTitle(sTitle);
+				}
+			}
 		} else if (c_oSerDocPr.Descr === type) {
 			docPr.setDescr(this.stream.GetString2LE(length));
+			if (oParaDrawing && oParaDrawing.GraphicObj && oParaDrawing.GraphicObj.setDescription) {
+				var sDescr = docPr.descr;
+				var sGrDescr = oParaDrawing.GraphicObj.getDescription ? oParaDrawing.GraphicObj.getDescription() : null;
+				if ((null == sGrDescr || sGrDescr === "") && null != sDescr && sDescr !== "") {
+					oParaDrawing.GraphicObj.setDescription(sDescr);
+				}
+			}
 		} else if (c_oSerDocPr.Form === type) {
 			oParaDrawing.SetForm(this.stream.GetBool());
 		} else {
