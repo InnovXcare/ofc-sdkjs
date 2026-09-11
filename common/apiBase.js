@@ -549,8 +549,17 @@
 	{
 		this.CoAuthoringApi.set_changesJson(changes,done)
 	}
+	
+	baseEditorsApi.prototype._standaloneOpenEpoch = 0;
+	baseEditorsApi.prototype._standaloneOpenTimer = null;
 	baseEditorsApi.prototype.asc_openDocumentForStandalone = function(documentInfo) {
-		setTimeout(() => {
+		
+		var epoch = this._standaloneOpenEpoch;
+		this._standaloneOpenTimer = setTimeout(() => {
+			this._standaloneOpenTimer = null;
+			if (epoch !== this._standaloneOpenEpoch) {
+				return;
+			}
 			this.CoAuthoringApi.onDocumentOpen(documentInfo);
 		}, 2000);
 	}
@@ -5499,6 +5508,15 @@
 
 	baseEditorsApi.prototype.asc_openDocumentFromBytes = function(data)
 	{
+		// The host is opening the real bin, so a template open from
+		// asc_openDocumentForStandalone is now stale. Cancel it if its timer has
+		// not fired, and bump the epoch so one already in flight stands down
+		// rather than reopening the template over this document.
+		this._standaloneOpenEpoch++;
+		if (this._standaloneOpenTimer) {
+			clearTimeout(this._standaloneOpenTimer);
+			this._standaloneOpenTimer = null;
+		}
 		// Reloading bin on an already-open document requires teardown first (see pluginMethod_OpenFile).
 		if (this.WordControl && this.WordControl.m_oLogicDocument && this.asc_CloseFile) {
 			this.asc_CloseFile();
