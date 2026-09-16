@@ -5508,6 +5508,32 @@
 
 	baseEditorsApi.prototype.asc_openDocumentFromBytes = function(data)
 	{
+		// Check the buffer before tearing anything down. onEndLoadFile applies this
+		// same test, but only after asc_CloseFile() below has already destroyed the
+		// document that was open — so a malformed buffer costs the user the report
+		// they were working on and surfaces as error -85, "the file content does not
+		// match the file extension", on top of a document that had loaded correctly.
+		// Every caller reaches the editor through here, so one check covers them all.
+		// The predicate is copied from onEndLoadFile deliberately: this guard must
+		// never reject a buffer that onEndLoadFile would have accepted.
+		var bytes = (data instanceof Uint8Array) ? data : (data ? new Uint8Array(data) : null);
+		var detectedEditorId = bytes ? AscCommon.getEditorBySignature(bytes) : null;
+		var isNativeFormat = bytes ? AscCommon.checkNativeViewerSignature(bytes) : false;
+		if (!bytes || bytes.length <= 4 ||
+			(this.isPdfEditor() ? !isNativeFormat : this.editorId !== detectedEditorId)) {
+			// No asc_onError here: the open document is untouched, so there is nothing
+			// critical to report, and a NoCritical event would still raise a modal. The
+			// caller that supplied the buffer owns the user-facing message; this log and
+			// stack name that caller.
+			console.error('asc_openDocumentFromBytes: refused, buffer is not a document for this editor', {
+				bytes: bytes ? bytes.length : 0,
+				head: (bytes && bytes.length >= 4) ? String.fromCharCode.apply(null, bytes.subarray(0, 4)) : null,
+				expectedEditorId: this.editorId,
+				detectedEditorId: detectedEditorId
+			});
+			console.trace('asc_openDocumentFromBytes: refused buffer supplied from');
+			return;
+		}
 		// The host is opening the real bin, so a template open from
 		// asc_openDocumentForStandalone is now stale. Cancel it if its timer has
 		// not fired, and bump the epoch so one already in flight stands down
@@ -5522,7 +5548,7 @@
 			this.asc_CloseFile();
 		}
 		let file = new AscCommon.OpenFileResult();
-		file.data = data;
+		file.data = bytes;
 		file.bSerFormat = AscCommon.checkStreamSignature(file.data, AscCommon.c_oSerFormat.Signature);
 		this.onEndLoadFile(file);
 	};
