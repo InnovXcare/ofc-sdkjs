@@ -570,7 +570,7 @@
 			return;
 		}
 		AscCommon.g_oDocumentUrls.addUrls(urls);
-		if (this.ImageLoader && this.WordControl && this.WordControl.m_oLogicDocument) {
+		if (this.isDocumentLoadComplete && this.ImageLoader && this.WordControl && this.WordControl.m_oLogicDocument) {
 			var imageMap = this.WordControl.m_oLogicDocument.ImageMap;
 			if (imageMap) {
 				// console.log("IMAGE_MAPS:::", imageMap);
